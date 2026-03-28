@@ -17,15 +17,17 @@ _client = genai.Client(api_key=GOOGLE_API_KEY)
 # ---------------------------------------------------------------------------
 
 _CONCEPT_SUFFIX = (
-    "Extract 4-6 core visual concepts from this slide that would be well "
-    "represented by icons. Focus on concrete, specific ideas — not abstractions.\n"
+    "Extract 4-6 core concepts or actions from this slide that would be well "
+    "represented by icons in a universally understandable way. "
+    "Avoid abstract, ambiguous, or culture-specific symbols that might confuse users.\n"
     'Return ONLY a JSON array of short strings. No markdown, no explanation.\n'
     'Example: ["bar chart", "user profile", "cloud upload", "lock", "settings"]'
 )
 
 _TAGGEN_PROMPT = (
     'Generate 10 descriptive tags for the icon named "{name}".\n'
-    "Tags should describe what the icon looks like AND what it symbolises.\n"
+    "Tags should describe what the icon looks like AND what it symbolises "
+    "in a universally understandable way. Avoid abstract, ambiguous, or culture-specific symbols.\n"
     "Return ONLY a JSON array of strings. No markdown, no explanation."
 )
 
