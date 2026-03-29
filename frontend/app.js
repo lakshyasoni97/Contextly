@@ -6,56 +6,54 @@
 
 // ─── DOM refs ────────────────────────────────────────────────
 
-const tabText         = document.getElementById('tab-text');
-const tabImage        = document.getElementById('tab-image');
-const panelText       = document.getElementById('panel-text');
-const panelImage      = document.getElementById('panel-image');
+const tabText = document.getElementById('tab-text');
+const tabImage = document.getElementById('tab-image');
+const panelText = document.getElementById('panel-text');
+const panelImage = document.getElementById('panel-image');
 
-const slideTextarea   = document.getElementById('slide-text');
-const charCount       = document.getElementById('char-count');
-const analyzeTextBtn  = document.getElementById('analyze-text-btn');
+const slideTextarea = document.getElementById('slide-text');
+const charCount = document.getElementById('char-count');
+const analyzeTextBtn = document.getElementById('analyze-text-btn');
 const analyzeImageBtn = document.getElementById('analyze-image-btn');
 
-const dropZone        = document.getElementById('drop-zone');
-const fileInput       = document.getElementById('file-input');
-const dropPreview     = document.getElementById('drop-preview');
-const previewThumb    = document.getElementById('preview-thumb');
-const previewName     = document.getElementById('preview-name');
-const removeImageBtn  = document.getElementById('remove-image');
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const dropPreview = document.getElementById('drop-preview');
+const previewThumb = document.getElementById('preview-thumb');
+const previewName = document.getElementById('preview-name');
+const removeImageBtn = document.getElementById('remove-image');
 
-const errorBanner     = document.getElementById('error-banner');
-const resultsSection  = document.getElementById('results-section');
-const conceptChips    = document.getElementById('concept-chips');
-const resultsCount    = document.getElementById('results-count');
-const iconGrid        = document.getElementById('icon-grid');
-const emptyState      = document.getElementById('empty-state');
-const toast           = document.getElementById('toast');
+const errorBanner = document.getElementById('error-banner');
+const resultsSection = document.getElementById('results-section');
+const conceptChips = document.getElementById('concept-chips');
+const resultsCount = document.getElementById('results-count');
+const iconGrid = document.getElementById('icon-grid');
+const emptyState = document.getElementById('empty-state');
+const toast = document.getElementById('toast');
 
 // Customizer refs
-const ctrlColor       = document.getElementById('ctrl-color');
-const ctrlColorHex    = document.getElementById('ctrl-color-hex');
-const ctrlStroke      = document.getElementById('ctrl-stroke');
-const ctrlStrokeVal   = document.getElementById('ctrl-stroke-val');
-const ctrlSize        = document.getElementById('ctrl-size');
-const ctrlSizeVal     = document.getElementById('ctrl-size-val');
-const ctrlAbsStroke   = document.getElementById('ctrl-abs-stroke');
-const ctrlFilled      = document.getElementById('ctrl-filled');
-const ctrlCircle      = document.getElementById('ctrl-circle');
-const resetBtn        = document.getElementById('reset-customizer');
+const ctrlColor = document.getElementById('ctrl-color');
+const ctrlColorHex = document.getElementById('ctrl-color-hex');
+const ctrlStroke = document.getElementById('ctrl-stroke');
+const ctrlStrokeVal = document.getElementById('ctrl-stroke-val');
+const ctrlSize = document.getElementById('ctrl-size');
+const ctrlSizeVal = document.getElementById('ctrl-size-val');
+const ctrlAbsStroke = document.getElementById('ctrl-abs-stroke');
+const ctrlCircle = document.getElementById('ctrl-circle');
+const resetBtn = document.getElementById('reset-customizer');
 
 // ─── State ───────────────────────────────────────────────────
 
 let selectedFile = null;
-let toastTimer   = null;
-let svgCache     = {};   // name → raw svg string
+let toastTimer = null;
+let svgCache = {};   // name → raw svg string
 
 const DEFAULTS = {
-  color:         '#e8edff',
-  strokeWidth:   2,
-  size:          40,
+  color: '#e8edff',
+  strokeWidth: 2,
+  size: 40,
   absoluteStroke: false,
-  filled:        false,
-  circle:        false,
+  circle: false,
 };
 
 const iconStyle = { ...DEFAULTS };
@@ -72,7 +70,7 @@ function activateTab(tab) {
   clearError();
 }
 
-tabText.addEventListener('click',  () => activateTab(tabText));
+tabText.addEventListener('click', () => activateTab(tabText));
 tabImage.addEventListener('click', () => activateTab(tabImage));
 
 // ─── Character count ─────────────────────────────────────────
@@ -85,7 +83,7 @@ slideTextarea.addEventListener('input', () => {
 
 // ─── Drag & drop / file picker ───────────────────────────────
 
-dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
 
 dropZone.addEventListener('drop', e => {
@@ -109,7 +107,7 @@ removeImageBtn.addEventListener('click', () => {
 
 function handleFileSelect(file) {
   if (!file.type.startsWith('image/')) { showError('Please select a PNG, JPG, or WebP image.'); return; }
-  if (file.size > 10 * 1024 * 1024)   { showError('Image must be under 10 MB.'); return; }
+  if (file.size > 10 * 1024 * 1024) { showError('Image must be under 10 MB.'); return; }
   selectedFile = file;
   previewName.textContent = file.name;
   const reader = new FileReader();
@@ -130,7 +128,7 @@ analyzeTextBtn.addEventListener('click', async () => {
   showSkeletons();
 
   try {
-    const res  = await fetch('/analyze/text', {
+    const res = await fetch('/analyze/text', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text }),
@@ -158,7 +156,7 @@ analyzeImageBtn.addEventListener('click', async () => {
   try {
     const form = new FormData();
     form.append('file', selectedFile);
-    const res  = await fetch('/analyze/image', { method: 'POST', body: form });
+    const res = await fetch('/analyze/image', { method: 'POST', body: form });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Something went wrong');
     renderResults(data);
@@ -204,7 +202,7 @@ function renderResults({ concepts, icons }) {
       if (!svgEl) return;
 
       // Normalise: let CSS control all visual properties
-      svgEl.setAttribute('width',  '100%');
+      svgEl.setAttribute('width', '100%');
       svgEl.setAttribute('height', '100%');
       svgEl.removeAttribute('stroke');      // will come from CSS currentColor
       svgEl.removeAttribute('stroke-width');// will come from CSS variable
@@ -232,11 +230,11 @@ function buildCard(icon, index) {
     </div>
     <span class="icon-name">${icon.name}</span>
     <div class="card-actions">
-      <button class="card-action" data-action="copy" data-name="${icon.name}" aria-label="Copy SVG for ${icon.name}">
+      <button class="card-action" data-action="copy" data-name="${icon.name}" aria-label="Copy PNG for ${icon.name}">
         <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy
       </button>
-      <button class="card-action" data-action="download" data-name="${icon.name}" aria-label="Download ${icon.name}">
+      <button class="card-action" data-action="download-png" data-name="${icon.name}" aria-label="Download for ${icon.name}">
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download
       </button>
@@ -247,8 +245,8 @@ function buildCard(icon, index) {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     e.stopPropagation();
-    if (btn.dataset.action === 'copy')     copySvg(btn.dataset.name);
-    if (btn.dataset.action === 'download') downloadSvgStyled(btn.dataset.name);
+    if (btn.dataset.action === 'copy') copyPng(btn.dataset.name);
+    if (btn.dataset.action === 'download-png') downloadPng(btn.dataset.name);
   });
 
   return card;
@@ -276,57 +274,54 @@ async function loadSvg(name) {
  * attributes so the exported file looks correct outside the browser.
  */
 function applyStylesToSvg(rawSvgText) {
-  const doc  = new DOMParser().parseFromString(rawSvgText, 'image/svg+xml');
-  const svg  = doc.documentElement;
+  const doc = new DOMParser().parseFromString(rawSvgText, 'image/svg+xml');
+  const svg = doc.documentElement;
   if (!svg || svg.tagName !== 'svg') return rawSvgText;
 
   const s = iconStyle;
 
   // Size
-  svg.setAttribute('width',  s.size);
+  svg.setAttribute('width', s.size);
   svg.setAttribute('height', s.size);
 
-  if (s.filled) {
-    // Filled: fill all paths with color, remove stroke
-    svg.setAttribute('fill',         s.color);
-    svg.setAttribute('stroke',       'none');
-    svg.setAttribute('stroke-width', '0');
-  } else {
-    // Normal stroke mode
-    svg.setAttribute('fill',              'none');
-    svg.setAttribute('stroke',            s.color);
-    svg.setAttribute('stroke-width',      s.strokeWidth);
-    svg.setAttribute('stroke-linecap',    'round');
-    svg.setAttribute('stroke-linejoin',   'round');
+  // Stroke mode
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', s.color);
+  svg.setAttribute('stroke-width', s.strokeWidth);
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
 
-    if (s.absoluteStroke) {
-      svg.querySelectorAll('*').forEach(el =>
-        el.setAttribute('vector-effect', 'non-scaling-stroke')
-      );
-    }
+  if (s.absoluteStroke) {
+    svg.querySelectorAll('*').forEach(el =>
+      el.setAttribute('vector-effect', 'non-scaling-stroke')
+    );
   }
 
   // Circle background: inject a translucent circle behind everything
   if (s.circle) {
     const vbParts = (svg.getAttribute('viewBox') || '0 0 24 24').trim().split(/\s+/).map(Number);
-    const [, , vw, vh] = vbParts;
+    const [vbX, vbY, vw, vh] = vbParts;
     const cx = vw / 2;
     const cy = vh / 2;
-    const r  = Math.max(vw, vh) / 2 * 1.15;
+    const r = Math.max(vw, vh) / 2 * 1.15;
+
+    // Expand the viewBox so the circle is not clipped during PNG export
+    const pad = Math.ceil(r - Math.min(vw, vh) / 2 + 1);
+    svg.setAttribute('viewBox', `${vbX - pad} ${vbY - pad} ${vw + pad * 2} ${vh + pad * 2}`);
 
     // Convert hex color → rgba for the circle fill
     const hex = s.color.replace('#', '');
-    const ri  = parseInt(hex.slice(0, 2), 16);
-    const gi  = parseInt(hex.slice(2, 4), 16);
-    const bi  = parseInt(hex.slice(4, 6), 16);
+    const ri = parseInt(hex.slice(0, 2), 16);
+    const gi = parseInt(hex.slice(2, 4), 16);
+    const bi = parseInt(hex.slice(4, 6), 16);
 
     const circle = doc.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('cx',            cx);
-    circle.setAttribute('cy',            cy);
-    circle.setAttribute('r',             r);
-    circle.setAttribute('fill',          `rgb(${ri},${gi},${bi})`);
-    circle.setAttribute('fill-opacity',  '0.12');
-    circle.setAttribute('stroke',        'none');
+    circle.setAttribute('cx', cx);
+    circle.setAttribute('cy', cy);
+    circle.setAttribute('r', r);
+    circle.setAttribute('fill', `rgb(${ri},${gi},${bi})`);
+    circle.setAttribute('fill-opacity', '0.12');
+    circle.setAttribute('stroke', 'none');
     svg.insertBefore(circle, svg.firstChild);
   }
 
@@ -335,33 +330,61 @@ function applyStylesToSvg(rawSvgText) {
 
 // ─── Copy / Download ─────────────────────────────────────────
 
-async function copySvg(name) {
-  const raw = await loadSvg(name);
-  if (!raw) { showToast('Icon not available :('); return; }
-  const styled = applyStylesToSvg(raw);
+function getPngBlob(name) {
+  return new Promise(async (resolve) => {
+    const raw = await loadSvg(name);
+    if (!raw) return resolve(null);
+    const styled = applyStylesToSvg(raw);
+
+    const img = new Image();
+    const canvas = document.createElement('canvas');
+    const size = iconStyle.size;
+    // Export at 4x resolution for small sizes to keep it crisp, otherwise 2x
+    const scale = (size > 0 && size < 64) ? 4 : 2;
+    canvas.width = size * scale;
+    canvas.height = size * scale;
+    const ctx = canvas.getContext('2d');
+
+    img.onload = () => {
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, 0, 0, size, size);
+      canvas.toBlob(blob => resolve(blob), 'image/png');
+    };
+    img.onerror = () => resolve(null);
+
+    const svgBlob = new Blob([styled], { type: 'image/svg+xml;charset=utf-8' });
+    img.src = URL.createObjectURL(svgBlob);
+  });
+}
+
+async function copyPng(name) {
+  const blob = await getPngBlob(name);
+  if (!blob) { showToast('Icon not available :('); return; }
   try {
-    await navigator.clipboard.writeText(styled);
-    showToast(`Copied ${name}.svg!`);
-  } catch {
+    const item = new ClipboardItem({ [blob.type]: blob });
+    await navigator.clipboard.write([item]);
+    showToast(`Copied ${name}.png!`);
+  } catch (err) {
+    console.error(err);
     showToast('Clipboard access denied. Try Download instead.');
   }
 }
 
-async function downloadSvgStyled(name) {
-  const raw = await loadSvg(name);
-  if (!raw) { showToast('Icon not available :('); return; }
-  const styled = applyStylesToSvg(raw);
-  const blob = new Blob([styled], { type: 'image/svg+xml' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `${name}.svg`;
+async function downloadPng(name) {
+  const blob = await getPngBlob(name);
+  if (!blob) { showToast('Icon not available :('); return; }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${name}.png`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast(`Downloading ${name}.svg`);
+  showToast(`Downloading ${name}.png`);
 }
+
+
 
 // ─── Customizer logic ─────────────────────────────────────────
 
@@ -370,21 +393,20 @@ function applyCustomizer() {
   const root = document.documentElement;
 
   // CSS variables for live icon preview
-  root.style.setProperty('--icon-color',        iconStyle.color);
+  root.style.setProperty('--icon-color', iconStyle.color);
   root.style.setProperty('--icon-stroke-width', iconStyle.strokeWidth);
-  root.style.setProperty('--icon-size',         `${iconStyle.size}px`);
+  root.style.setProperty('--icon-size', `${iconStyle.size}px`);
 
   // Compute a translucent version of the color for the circle
   const hex = iconStyle.color.replace('#', '');
-  const r   = parseInt(hex.slice(0, 2), 16);
-  const g   = parseInt(hex.slice(2, 4), 16);
-  const b   = parseInt(hex.slice(4, 6), 16);
-  root.style.setProperty('--icon-circle-bg',     `rgba(${r},${g},${b},0.12)`);
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  root.style.setProperty('--icon-circle-bg', `rgba(${r},${g},${b},0.12)`);
   root.style.setProperty('--icon-circle-border', `rgba(${r},${g},${b},0.25)`);
 
   // Class modifiers toggle visual modes on the grid
-  iconGrid.classList.toggle('icon-filled',     iconStyle.filled);
-  iconGrid.classList.toggle('icon-circle',     iconStyle.circle);
+  iconGrid.classList.toggle('icon-circle', iconStyle.circle);
   iconGrid.classList.toggle('icon-abs-stroke', iconStyle.absoluteStroke);
 }
 
@@ -428,13 +450,6 @@ ctrlAbsStroke.addEventListener('change', () => {
   applyCustomizer();
 });
 
-// Filled toggle
-ctrlFilled.addEventListener('change', () => {
-  iconStyle.filled = ctrlFilled.checked;
-  // Filled and absolute stroke are mutually exclusive in a meaningful sense
-  applyCustomizer();
-});
-
 // Circle background toggle
 ctrlCircle.addEventListener('change', () => {
   iconStyle.circle = ctrlCircle.checked;
@@ -446,15 +461,14 @@ resetBtn.addEventListener('click', () => {
   Object.assign(iconStyle, DEFAULTS);
 
   // Sync controls to defaults
-  ctrlColor.value         = DEFAULTS.color;
+  ctrlColor.value = DEFAULTS.color;
   ctrlColorHex.textContent = DEFAULTS.color;
-  ctrlStroke.value        = DEFAULTS.strokeWidth;
+  ctrlStroke.value = DEFAULTS.strokeWidth;
   ctrlStrokeVal.textContent = `${DEFAULTS.strokeWidth}`;
-  ctrlSize.value          = DEFAULTS.size;
+  ctrlSize.value = DEFAULTS.size;
   ctrlSizeVal.textContent = `${DEFAULTS.size}px`;
-  ctrlAbsStroke.checked   = DEFAULTS.absoluteStroke;
-  ctrlFilled.checked      = DEFAULTS.filled;
-  ctrlCircle.checked      = DEFAULTS.circle;
+  ctrlAbsStroke.checked = DEFAULTS.absoluteStroke;
+  ctrlCircle.checked = DEFAULTS.circle;
 
   updateSliderFill(ctrlStroke);
   updateSliderFill(ctrlSize);
